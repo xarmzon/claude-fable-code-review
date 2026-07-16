@@ -1,0 +1,73 @@
+<fieldset class="form-fieldset">
+  <legend>Delivery address</legend>
+
+  <div class="form-field">
+    <label [for]="idPrefix() + '-street'">Street</label>
+    <input
+      [id]="idPrefix() + '-street'"
+      type="text"
+      autocomplete="street-address"
+      [formField]="address().street"
+      [attr.aria-invalid]="invalid(address().street) || null"
+      [attr.aria-describedby]="invalid(address().street) ? idPrefix() + '-street-error' : null"
+    />
+    @if (invalid(address().street)) {
+      <p class="field-error" [id]="idPrefix() + '-street-error'">
+        {{ errorText(address().street) }}
+      </p>
+    }
+  </div>
+
+  <div class="form-row">
+    <div class="form-field">
+      <label [for]="idPrefix() + '-zip'">ZIP code</label>
+      <input
+        [id]="idPrefix() + '-zip'"
+        type="text"
+        autocomplete="postal-code"
+        [formField]="address().zip"
+        [attr.aria-invalid]="invalid(address().zip) || null"
+        [attr.aria-describedby]="invalid(address().zip) ? idPrefix() + '-zip-error' : null"
+      />
+      @if (invalid(address().zip)) {
+        <p class="field-error" [id]="idPrefix() + '-zip-error'">
+          {{ errorText(address().zip) }}
+        </p>
+      }
+    </div>
+
+    <div class="form-field">
+      <label [for]="idPrefix() + '-city'">City</label>
+      <input
+        [id]="idPrefix() + '-city'"
+        type="text"
+        autocomplete="address-level2"
+        [formField]="address().city"
+        [attr.aria-invalid]="invalid(address().city) || null"
+        [attr.aria-describedby]="invalid(address().city) ? idPrefix() + '-city-error' : null"
+      />
+      @if (invalid(address().city)) {
+        <p class="field-error" [id]="idPrefix() + '-city-error'">
+          {{ errorText(address().city) }}
+        </p>
+      }
+    </div>
+  </div>
+
+  <div class="form-field">
+    <label [for]="idPrefix() + '-country'">Country</label>
+    <input
+      [id]="idPrefix() + '-country'"
+      type="text"
+      autocomplete="country-name"
+      [formField]="address().country"
+      [attr.aria-invalid]="invalid(address().country) || null"
+      [attr.aria-describedby]="invalid(address().country) ? idPrefix() + '-country-error' : null"
+    />
+    @if (invalid(address().country)) {
+      <p class="field-error" [id]="idPrefix() + '-country-error'">
+        {{ errorText(address().country) }}
+      </p>
+    }
+  </div>
+</fieldset>

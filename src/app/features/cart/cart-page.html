@@ -1,0 +1,81 @@
+<h1>Your cart</h1>
+
+@if (cart.isEmpty()) {
+  <div class="empty-state">
+    <h2>Your cart is empty</h2>
+    <p>Browse the catalog to find something you like.</p>
+    <a routerLink="/" class="button">Go to products</a>
+  </div>
+} @else {
+  <div class="panel cart-panel">
+    <table class="cart-table">
+      <caption class="visually-hidden">
+        Items in your cart with editable quantities
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Product</th>
+          <th scope="col">Unit price</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Total</th>
+          <th scope="col"><span class="visually-hidden">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of cart.items(); track item.product.id) {
+          <tr>
+            <th scope="row">{{ item.product.name }}</th>
+            <td>{{ item.product.price | currency: 'EUR' }}</td>
+            <td>
+              <div class="quantity-stepper">
+                <button
+                  type="button"
+                  class="button button--secondary quantity-stepper__button"
+                  (click)="decrement(item)"
+                  [disabled]="item.quantity <= 1"
+                  [attr.aria-label]="'Decrease quantity of ' + item.product.name"
+                >
+                  &minus;
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  inputmode="numeric"
+                  [value]="item.quantity"
+                  (change)="onQuantityChange(item, $event)"
+                  [attr.aria-label]="'Quantity of ' + item.product.name"
+                />
+                <button
+                  type="button"
+                  class="button button--secondary quantity-stepper__button"
+                  (click)="increment(item)"
+                  [attr.aria-label]="'Increase quantity of ' + item.product.name"
+                >
+                  +
+                </button>
+              </div>
+            </td>
+            <td>{{ lineTotal(item) | currency: 'EUR' }}</td>
+            <td>
+              <button
+                type="button"
+                class="link-button"
+                (click)="cart.remove(item.product.id)"
+                [attr.aria-label]="'Remove ' + item.product.name + ' from cart'"
+              >
+                Remove
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="cart-summary">
+      <p class="cart-summary__total" aria-live="polite">
+        Subtotal: <strong>{{ cart.subtotal() | currency: 'EUR' }}</strong>
+      </p>
+      <a routerLink="/checkout" class="button">Proceed to checkout</a>
+    </div>
+  </div>
+}

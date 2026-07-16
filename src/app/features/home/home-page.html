@@ -1,0 +1,66 @@
+<h1>Products</h1>
+
+<form class="catalog-toolbar" role="search" (submit)="$event.preventDefault()">
+  <div class="form-field catalog-toolbar__search">
+    <label for="catalog-search">Search products</label>
+    <input
+      id="catalog-search"
+      type="search"
+      placeholder="e.g. lamp, notebook…"
+      [value]="query()"
+      (input)="onSearchInput($event)"
+    />
+  </div>
+  <div class="form-field">
+    <label for="catalog-sort">Sort by</label>
+    <select id="catalog-sort" (change)="onSortChange($event)">
+      <option value="name" [selected]="sort() === 'name'">Name</option>
+      <option value="price-asc" [selected]="sort() === 'price-asc'">Price: low to high</option>
+      <option value="price-desc" [selected]="sort() === 'price-desc'">Price: high to low</option>
+    </select>
+  </div>
+</form>
+
+<p class="catalog-count" aria-live="polite">
+  @if (products.isLoading()) {
+    Loading products…
+  } @else {
+    {{ products.value().length }} products found
+  }
+</p>
+
+<div class="visually-hidden" role="status">{{ announcement() }}</div>
+
+@if (products.error()) {
+  <div class="form-alert" role="alert">
+    Could not load products. Check that the API server is running and try again.
+  </div>
+} @else if (!products.isLoading() && products.value().length === 0) {
+  <div class="empty-state">
+    <h2>No products match your search</h2>
+    <p>Try a different search term or clear the search box.</p>
+  </div>
+} @else {
+  <ul class="product-grid">
+    @for (product of products.value(); track product.id) {
+      <li class="product-card panel">
+        <div class="product-card__art" aria-hidden="true" [style.--art-hue]="artHue(product)">
+          {{ product.name.charAt(0) }}
+        </div>
+        <h2 class="product-card__name">{{ product.name }}</h2>
+        <p class="product-card__description">{{ product.description }}</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">{{ product.price | currency: 'EUR' }}</span>
+          <button
+            type="button"
+            class="button"
+            (click)="addToCart(product)"
+            [attr.aria-label]="'Add ' + product.name + ' to cart'"
+          >
+            Add to cart
+          </button>
+        </div>
+      </li>
+    }
+  </ul>
+}
