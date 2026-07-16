@@ -1,59 +1,46 @@
-# ClaudeFableCodeReview
+# Fable Shop
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.6.
+A small, production-shaped e-commerce demo: Angular v22 SPA plus a standalone Node/Express mock
+backend. See [docs/product-requirement.md](docs/product-requirement.md) for the full spec.
 
-## Development server
+- Product catalog with server-side search (`?q=`) and sorting (`?sort=`)
+- Cart with editable quantities, persisted in `localStorage`
+- Checkout with Signal Forms, a shared delivery-address sub-form, and EU VAT validation
+- Guest checkout with optional account creation
+- JWT auth: in-memory access token + rotating httpOnly refresh cookie, silent session restore
+- Dashboard with order history and an editable profile
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Getting started
 
 ```bash
-ng generate component component-name
+npm install
+npm run dev
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+`npm run dev` starts the mock API (`http://localhost:3000`) and the Angular dev server
+(`http://localhost:4200`) together; `/api/*` is proxied same-origin so auth cookies work without
+CORS.
 
-```bash
-ng generate --help
+Demo account: `demo@example.com` / `Demo1234!` (seeded with 3 orders).
+
+All backend data lives in process memory and resets on restart.
+
+## Scripts
+
+| Script           | Purpose                                     |
+| ---------------- | ------------------------------------------- |
+| `npm run dev`    | API + frontend together (concurrently)      |
+| `npm start`      | Angular dev server only                     |
+| `npm run server` | Mock API only (tsx watch)                   |
+| `npm run build`  | Production build                            |
+| `npm test`       | Vitest suite (VAT validator, cart store, …) |
+
+## Layout
+
 ```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
+server/          Express mock backend (in-memory data, scrypt passwords, HS256 JWTs)
+shared/          Types shared between client and server (single source of truth)
+src/app/core/    Auth service + interceptor + guards, cart store, orders API
+src/app/shared/  Address sub-form, validation schemas, VAT validator
+src/app/features/ Lazy-loaded pages: home, cart, checkout, login, dashboard
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

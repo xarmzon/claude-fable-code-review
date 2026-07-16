@@ -1,0 +1,150 @@
+<h1>Checkout</h1>
+
+@if (confirmedOrder(); as order) {
+  <div class="panel checkout-confirmation" role="status">
+    <h2>Thank you for your order!</h2>
+    <p>
+      Order <strong>{{ order.id }}</strong> has been placed. A confirmation was sent to your email
+      address.
+    </p>
+    <p class="checkout-confirmation__total">
+      Total paid: <strong>{{ order.total | currency: 'EUR' }}</strong>
+    </p>
+    <a routerLink="/" class="button">Continue shopping</a>
+  </div>
+} @else if (cart.isEmpty()) {
+  <div class="empty-state">
+    <h2>Your cart is empty</h2>
+    <p>Add some products before checking out.</p>
+    <a routerLink="/" class="button">Go to products</a>
+  </div>
+} @else {
+  <div class="checkout-layout">
+    <form class="panel" (submit)="onSubmit(); $event.preventDefault()">
+      @if (submitError()) {
+        <div class="form-alert" role="alert">{{ submitError() }}</div>
+      }
+
+      <h2>Your details</h2>
+
+      <div class="form-field">
+        <label for="checkout-full-name">Full name</label>
+        <input
+          id="checkout-full-name"
+          type="text"
+          autocomplete="name"
+          [formField]="checkoutForm.customer.fullName"
+          [attr.aria-invalid]="invalid(checkoutForm.customer.fullName) || null"
+          [attr.aria-describedby]="
+            invalid(checkoutForm.customer.fullName) ? 'checkout-full-name-error' : null
+          "
+        />
+        @if (invalid(checkoutForm.customer.fullName)) {
+          <p class="field-error" id="checkout-full-name-error">
+            {{ errorText(checkoutForm.customer.fullName) }}
+          </p>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="checkout-email">Email</label>
+        <input
+          id="checkout-email"
+          type="email"
+          autocomplete="email"
+          [formField]="checkoutForm.customer.email"
+          [attr.aria-invalid]="invalid(checkoutForm.customer.email) || null"
+          [attr.aria-describedby]="
+            invalid(checkoutForm.customer.email) ? 'checkout-email-error' : null
+          "
+        />
+        @if (invalid(checkoutForm.customer.email)) {
+          <p class="field-error" id="checkout-email-error">
+            {{ errorText(checkoutForm.customer.email) }}
+          </p>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="checkout-vat">VAT ID</label>
+        <input
+          id="checkout-vat"
+          type="text"
+          [formField]="checkoutForm.customer.vatId"
+          [attr.aria-invalid]="invalid(checkoutForm.customer.vatId) || null"
+          [attr.aria-describedby]="
+            invalid(checkoutForm.customer.vatId) ? 'checkout-vat-error' : 'checkout-vat-hint'
+          "
+        />
+        @if (invalid(checkoutForm.customer.vatId)) {
+          <p class="field-error" id="checkout-vat-error">
+            {{ errorText(checkoutForm.customer.vatId) }}
+          </p>
+        } @else {
+          <p class="field-hint" id="checkout-vat-hint">
+            Two-letter country code followed by 2–12 characters, e.g. DE123456789.
+          </p>
+        }
+      </div>
+
+      <app-address-fields [address]="checkoutForm.address" idPrefix="checkout-address" />
+
+      @if (!auth.isAuthenticated()) {
+        <div class="form-field form-field--checkbox">
+          <label>
+            <input type="checkbox" [formField]="checkoutForm.createAccount" />
+            Create an account from this data
+          </label>
+        </div>
+
+        @if (checkoutForm.createAccount().value()) {
+          <div class="form-field">
+            <label for="checkout-password">Password</label>
+            <input
+              id="checkout-password"
+              type="password"
+              autocomplete="new-password"
+              [formField]="checkoutForm.password"
+              [attr.aria-invalid]="invalid(checkoutForm.password) || null"
+              [attr.aria-describedby]="
+                invalid(checkoutForm.password)
+                  ? 'checkout-password-error'
+                  : 'checkout-password-hint'
+              "
+            />
+            @if (invalid(checkoutForm.password)) {
+              <p class="field-error" id="checkout-password-error">
+                {{ errorText(checkoutForm.password) }}
+              </p>
+            } @else {
+              <p class="field-hint" id="checkout-password-hint">At least 8 characters.</p>
+            }
+          </div>
+        }
+      }
+
+      <button type="submit" class="button checkout-submit" [disabled]="busy()">
+        @if (busy()) {
+          Placing order…
+        } @else {
+          Place order
+        }
+      </button>
+    </form>
+
+    <aside class="panel checkout-summary" aria-labelledby="checkout-summary-heading">
+      <h2 id="checkout-summary-heading">Order summary</h2>
+      <ul class="checkout-summary__list">
+        @for (item of cart.items(); track item.product.id) {
+          <li>
+            <span>{{ item.quantity }} × {{ item.product.name }}</span>
+            <span>{{ item.product.price * item.quantity | currency: 'EUR' }}</span>
+          </li>
+        }
+      </ul>
+      <p class="checkout-summary__total">
+        Total: <strong>{{ cart.subtotal() | currency: 'EUR' }}</strong>
+      </p>
+    </aside>
+  </div>
+}

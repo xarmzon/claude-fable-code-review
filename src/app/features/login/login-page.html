@@ -1,0 +1,51 @@
+<div class="login-layout">
+  <form class="panel" (submit)="onSubmit(); $event.preventDefault()">
+    <h1>Sign in</h1>
+
+    @if (error()) {
+      <div class="form-alert" role="alert">{{ error() }}</div>
+    }
+
+    <div class="form-field">
+      <label for="login-email">Email</label>
+      <input
+        id="login-email"
+        type="email"
+        autocomplete="email"
+        [formField]="loginForm.email"
+        [attr.aria-invalid]="invalid(loginForm.email) || null"
+        [attr.aria-describedby]="invalid(loginForm.email) ? 'login-email-error' : null"
+      />
+      @if (invalid(loginForm.email)) {
+        <p class="field-error" id="login-email-error">{{ errorText(loginForm.email) }}</p>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="login-password">Password</label>
+      <input
+        id="login-password"
+        type="password"
+        autocomplete="current-password"
+        [formField]="loginForm.password"
+        [attr.aria-invalid]="invalid(loginForm.password) || null"
+        [attr.aria-describedby]="invalid(loginForm.password) ? 'login-password-error' : null"
+      />
+      @if (invalid(loginForm.password)) {
+        <p class="field-error" id="login-password-error">{{ errorText(loginForm.password) }}</p>
+      }
+    </div>
+
+    <button type="submit" class="button login-submit" [disabled]="busy()">
+      @if (busy()) {
+        Signing in…
+      } @else {
+        Sign in
+      }
+    </button>
+
+    <p class="field-hint login-demo-hint">
+      Demo account: <code>demo&#64;example.com</code> / <code>Demo1234!</code>
+    </p>
+  </form>
+</div>
