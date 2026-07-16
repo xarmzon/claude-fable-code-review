@@ -1,0 +1,126 @@
+<h1>Your dashboard</h1>
+
+<div class="dashboard-layout">
+  <section aria-labelledby="orders-heading">
+    <h2 id="orders-heading">Order history</h2>
+
+    @if (orders.isLoading()) {
+      <p aria-live="polite">Loading your orders…</p>
+    } @else if (orders.error()) {
+      <div class="form-alert" role="alert">Could not load your orders. Please reload the page.</div>
+    } @else if (orders.value().length === 0) {
+      <div class="empty-state">
+        <h3>No orders yet</h3>
+        <p>Orders you place will show up here.</p>
+      </div>
+    } @else {
+      <ul class="order-list">
+        @for (order of orders.value(); track order.id) {
+          <li class="panel order-card">
+            <div class="order-card__header">
+              <h3 class="order-card__id">{{ order.id }}</h3>
+              <span class="status" [class]="'status status--' + order.status">
+                {{ order.status }}
+              </span>
+            </div>
+            <p class="order-card__date">Placed on {{ order.createdAt | date: 'mediumDate' }}</p>
+            <ul class="order-card__items">
+              @for (item of order.items; track item.productId) {
+                <li>
+                  <span>{{ item.quantity }} × {{ item.name }}</span>
+                  <span>{{ item.unitPrice * item.quantity | currency: 'EUR' }}</span>
+                </li>
+              }
+            </ul>
+            <p class="order-card__total">
+              Total: <strong>{{ order.total | currency: 'EUR' }}</strong>
+            </p>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section aria-labelledby="profile-heading">
+    <h2 id="profile-heading">Profile &amp; delivery address</h2>
+
+    <form class="panel" (submit)="onSubmit(); $event.preventDefault()">
+      @if (saveError()) {
+        <div class="form-alert" role="alert">{{ saveError() }}</div>
+      }
+      @if (saved()) {
+        <div class="form-success" role="status">Your profile has been saved.</div>
+      }
+
+      <div class="form-field">
+        <label for="profile-full-name">Full name</label>
+        <input
+          id="profile-full-name"
+          type="text"
+          autocomplete="name"
+          [formField]="profileForm.customer.fullName"
+          [attr.aria-invalid]="invalid(profileForm.customer.fullName) || null"
+          [attr.aria-describedby]="
+            invalid(profileForm.customer.fullName) ? 'profile-full-name-error' : null
+          "
+        />
+        @if (invalid(profileForm.customer.fullName)) {
+          <p class="field-error" id="profile-full-name-error">
+            {{ errorText(profileForm.customer.fullName) }}
+          </p>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="profile-email">Email</label>
+        <input
+          id="profile-email"
+          type="email"
+          autocomplete="email"
+          [formField]="profileForm.customer.email"
+          [attr.aria-invalid]="invalid(profileForm.customer.email) || null"
+          [attr.aria-describedby]="
+            invalid(profileForm.customer.email) ? 'profile-email-error' : null
+          "
+        />
+        @if (invalid(profileForm.customer.email)) {
+          <p class="field-error" id="profile-email-error">
+            {{ errorText(profileForm.customer.email) }}
+          </p>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="profile-vat">VAT ID</label>
+        <input
+          id="profile-vat"
+          type="text"
+          [formField]="profileForm.customer.vatId"
+          [attr.aria-invalid]="invalid(profileForm.customer.vatId) || null"
+          [attr.aria-describedby]="
+            invalid(profileForm.customer.vatId) ? 'profile-vat-error' : 'profile-vat-hint'
+          "
+        />
+        @if (invalid(profileForm.customer.vatId)) {
+          <p class="field-error" id="profile-vat-error">
+            {{ errorText(profileForm.customer.vatId) }}
+          </p>
+        } @else {
+          <p class="field-hint" id="profile-vat-hint">
+            Two-letter country code followed by 2–12 characters, e.g. DE123456789.
+          </p>
+        }
+      </div>
+
+      <app-address-fields [address]="profileForm.address" idPrefix="profile-address" />
+
+      <button type="submit" class="button" [disabled]="busy()">
+        @if (busy()) {
+          Saving…
+        } @else {
+          Save changes
+        }
+      </button>
+    </form>
+  </section>
+</div>
